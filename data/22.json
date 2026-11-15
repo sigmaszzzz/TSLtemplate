@@ -1,0 +1,30 @@
+{
+    "id": 67036109,
+    "name": "2.2",
+    "author": "Gamaker",
+    "creators": ["Gamaker"],
+    "verifier": "Suberman2",
+    "verification": "https://youtu.be/f10_buG2-lQ",
+    "percentToQualify": 100,
+    "password": "Not Copyable",
+    "records": [
+        {
+            "user": "Justgame",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 69
+        },
+        {
+            "user": "Mothcloakinnit",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 69
+        },
+        {
+      "user": "SimmebGaming",
+      "link": "https://youtu.be/_FsZFmc-OJo",
+      "percent": 100,
+      "hz": 120
+    }
+    ]
+}

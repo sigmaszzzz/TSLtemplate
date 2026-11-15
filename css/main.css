@@ -1,3 +1,8 @@
+
+/* ========================================
+   THEME
+   ======================================== */
+
 :root {
     --color-background: white;
     --color-on-background: black;
@@ -7,6 +12,11 @@
     --color-on-primary: white;
     --color-error: #de0000;
     --color-on-error: white;
+
+    --font-main: "Lexend Deca", sans-serif;
+    --border-subtle: var(--color-background-hover);
+    --surface-muted: rgba(128, 128, 128, 0.08);
+    --surface-raised: rgba(128, 128, 128, 0.12);
 }
 
 main.dark,
@@ -21,76 +31,1647 @@ header.dark {
     --color-on-primary: white;
     --color-error: #de0000;
     --color-on-error: white;
+    --surface-muted: rgba(255, 255, 255, 0.04);
+    --surface-raised: rgba(255, 255, 255, 0.07);
 }
+
+/* ========================================
+   GLOBAL LAYOUT
+   ======================================== */
 
 html,
 body {
+    width: 100%;
     height: 100%;
+    margin: 0;
 }
 
 body {
     display: flex;
     flex-direction: column;
-    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+    font-family: var(--font-main);
 }
 
 header,
 main {
     background-color: var(--color-background);
     color: var(--color-on-background);
-    display: grid;
-    grid-template-columns: minmax(16rem, 1fr) minmax(16rem, 2fr) minmax(
-            16em,
-            1fr
-        );
-    column-gap: 2rem;
 }
 
-header {
+body > header {
     display: flex;
-    padding-inline: calc(25vw - 10rem);
-    height: 4rem;
+    align-items: center;
+    gap: 2rem;
+    flex-shrink: 0;
+    min-height: 4rem;
+    padding-inline: max(1rem, calc((100vw - 1200px) / 2));
     background-color: var(--color-primary);
     color: var(--color-on-primary);
 }
-@media screen and (min-width: 1366px) {
-    header {
-        display: grid;
-        padding-inline: 0;
-    }
-}
-header .logo {
-    justify-self: end;
-    align-self: center;
+
+body > header .logo {
     display: flex;
-    align-items: flex-end;
-    gap: 1rem;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-shrink: 0;
 }
-header .nav {
+
+body > header .logo h2,
+body > header .logo p {
+    margin: 0;
+}
+
+body > header .nav {
+    display: flex;
+    align-items: center;
     flex: 1;
+    min-width: 0;
+}
+
+body > #app > header {
+    /* Header is the direct child of the Vue app body. */
+    width: 100%;
+}
+
+body > header .nav__actions {
+    min-width: 0;
+}
+
+body > #app > router-view {
+    display: block;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 main {
-    height: 0;
-    flex: 1;
-    display: grid;
-    grid-template-rows: minmax(0, 1fr);
-    column-gap: 2rem;
+    min-width: 0;
 }
+
 main > div {
-    overflow-y: auto;
+    min-width: 0;
 }
 
 .spinner {
     display: flex;
     align-items: center;
     justify-content: center;
-    grid-column: span 3;
+    grid-column: 1 / -1;
 }
 
 input[type="checkbox"] {
-    height: 1.25rem;
     width: 1.25rem;
-    cursor: pointer;
+    height: 1.25rem;
     margin: 0;
+    cursor: pointer;
+}
+
+/* Shared form controls */
+
+button,
+input,
+select,
+textarea {
+    font-family: var(--font-main);
+}
+
+input:not([type="checkbox"]),
+select,
+textarea {
+    max-width: 100%;
+    color: var(--color-on-background);
+    background-color: var(--color-background);
+}
+
+button {
+    color: inherit;
+}
+
+/* ========================================
+   LEADERBOARD
+   ======================================== */
+
+.page-leaderboard-container {
+    grid-column: 1 / -1;
+    min-width: 0;
+}
+
+.page-leaderboard {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+    align-items: start;
+    gap: 1.25rem;
+    width: calc(100% - 2rem);
+    max-width: 1500px;
+    margin: 1rem auto;
+    font-family: var(--font-main);
+}
+
+.page-leaderboard .board-container,
+.page-leaderboard .player-container {
+    min-width: 0;
+    padding: 1.25rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    background: var(--color-background);
+    color: var(--color-on-background);
+    box-sizing: border-box;
+}
+
+.page-leaderboard .leaderboard-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.page-leaderboard .leaderboard-controls label {
+    font-weight: 600;
+}
+
+.page-leaderboard .leaderboard-controls select {
+    padding: 0.65rem 2rem 0.65rem 0.8rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.page-leaderboard .board,
+.page-leaderboard .player .table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.page-leaderboard .board {
+    table-layout: fixed;
+}
+
+.page-leaderboard .board th,
+.page-leaderboard .board td,
+.page-leaderboard .player .table td {
+    padding: 0.7rem 0.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.page-leaderboard .board th {
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0.75;
+}
+
+.page-leaderboard .board tbody tr:hover {
+    background: var(--color-background-hover);
+}
+
+.page-leaderboard .board th:first-child,
+.page-leaderboard .board td.rank {
+    width: 3.5rem;
+}
+
+.page-leaderboard .board th:nth-child(2),
+.page-leaderboard .board td.total {
+    width: 6.5rem;
+}
+
+.page-leaderboard .board td.rank,
+.page-leaderboard .board td.total,
+.page-leaderboard .player .table td.rank,
+.page-leaderboard .player .table td.score {
+    white-space: nowrap;
+}
+
+.page-leaderboard .board td.total {
+    font-weight: 700;
+}
+
+.page-leaderboard .board td.user {
+    min-width: 0;
+}
+
+.page-leaderboard .board td.user button {
+    display: block;
+    width: 100%;
+    padding: 0.3rem;
+    border: 0;
+    border-radius: 0.375rem;
+    background: transparent;
+    color: var(--color-on-background);
+    font: inherit;
+    text-align: left;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
+.page-leaderboard .board td.user button:hover,
+.page-leaderboard .board td.user.active button {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+.page-leaderboard .player {
+    width: 100%;
+    min-width: 0;
+}
+
+.page-leaderboard .player h1 {
+    margin-top: 0;
+}
+
+.page-leaderboard .player h2 {
+    margin-top: 1.5rem;
+    font-size: 1.15rem;
+}
+
+.page-leaderboard .player h3 {
+    opacity: 0.8;
+}
+
+.page-leaderboard .player .table {
+    table-layout: fixed;
+}
+
+.page-leaderboard .player .table td.rank {
+    width: 2.75rem;
+    padding-inline: 0.35rem;
+}
+
+.page-leaderboard .player .table td.level {
+    width: auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.page-leaderboard .player .table td.level a {
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.page-leaderboard .player .table td.score {
+    width: 4.5rem;
+    padding-inline: 0.35rem;
+    text-align: right;
+}
+
+.page-leaderboard .player .table a {
+    color: var(--color-primary);
+}
+
+.page-leaderboard .player ul {
+    padding-left: 1.5rem;
+    line-height: 1.8;
+}
+
+.page-leaderboard .error {
+    color: var(--color-error);
+}
+
+/* ========================================
+   ROULETTE
+   ======================================== */
+
+.roulette-round-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    margin-block: 1.5rem;
+}
+
+.roulette-round-info p,
+.roulette-round-info h2 {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.roulette-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    margin-top: 1.25rem;
+}
+
+/* ========================================
+   GAMES HUB
+   ======================================== */
+
+.games-page,
+.page-higher-lower {
+    width: min(1100px, calc(100% - 2rem));
+    margin-inline: auto;
+    padding-block: 2rem;
+    color: var(--color-on-background);
+    font-family: var(--font-main);
+    box-sizing: border-box;
+}
+
+.games-page *,
+.games-page *::before,
+.games-page *::after,
+.page-higher-lower *,
+.page-higher-lower *::before,
+.page-higher-lower *::after {
+    box-sizing: border-box;
+}
+
+.games-page .games-hero {
+    margin-bottom: 2.5rem;
+}
+
+.games-page .games-eyebrow {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+    color: var(--color-primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.games-page .games-hero h1 {
+    margin: 0 0 0.75rem;
+    color: var(--color-on-background);
+    font-family: var(--font-main);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.games-page .games-hero p {
+    max-width: 38rem;
+    margin: 0;
+    color: var(--color-on-background);
+    font-size: 1rem;
+    line-height: 1.7;
+    opacity: 0.7;
+}
+
+.games-page .games-section {
+    width: 100%;
+    margin: 0;
+}
+
+.games-page .games-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.games-page .games-section-heading h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.games-page .games-section-heading > span {
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+.games-page .games-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    width: 100%;
+}
+
+.games-page a.game-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 16rem;
+    margin: 0;
+    padding: 1.5rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    background: var(--color-background);
+    color: var(--color-on-background);
+    font-family: var(--font-main);
+    text-decoration: none;
+    box-shadow: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.games-page a.game-card:hover {
+    border-color: var(--color-primary);
+    background: var(--color-background-hover);
+}
+
+.games-page a.game-card:focus-visible,
+.hl-card:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+}
+
+.games-page .game-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.games-page .game-number {
+    font-size: 0.75rem;
+    font-weight: 500;
+    opacity: 0.6;
+}
+
+.games-page .game-icon {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    flex-shrink: 0;
+    place-items: center;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.5rem;
+    background: var(--color-background);
+    font-size: 1.4rem;
+}
+
+.games-page .game-card-content {
+    flex: 1;
+    padding-block: 1.5rem;
+}
+
+.games-page .game-card-content h3 {
+    margin: 0 0 0.75rem;
+    color: var(--color-on-background);
+    font-family: var(--font-main);
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.games-page .game-card-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    opacity: 0.7;
+}
+
+.games-page .game-card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.games-page .game-card-bottom > span:first-child {
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+.games-page .game-play {
+    color: var(--color-primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.games-page .games-footer {
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.85rem;
+    text-align: center;
+    opacity: 0.6;
+}
+
+/* ========================================
+   HIGHER OR LOWER
+   ======================================== */
+
+.hl-header {
+    margin-bottom: 1.75rem;
+}
+
+.hl-header h1 {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-main);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.hl-header p,
+.hl-muted {
+    color: var(--color-on-background);
+    line-height: 1.6;
+    opacity: 0.7;
+}
+
+.hl-header p {
+    margin: 0;
+}
+
+.hl-settings {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.875rem;
+    width: 100%;
+    max-width: 30rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    background: var(--color-background);
+}
+
+.hl-settings h2 {
+    margin: 0 0 0.25rem;
+}
+
+.hl-scoreboard {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 180px));
+    gap: 1rem;
+    margin-block: 1.5rem 2rem;
+}
+
+.hl-scoreboard > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.625rem;
+    min-width: 0;
+    min-height: 5.5rem;
+    padding: 1rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    background: var(--surface-muted);
+}
+
+.hl-scoreboard span {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    opacity: 0.7;
+}
+
+.hl-scoreboard strong {
+    font-size: 1.75rem;
+    line-height: 1.2;
+}
+
+.hl-matchup {
+    width: 100%;
+    min-width: 0;
+}
+
+.hl-instruction {
+    margin: 0 0 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.hl-cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+.hl-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.875rem;
+    width: 100%;
+    min-width: 0;
+    min-height: 16rem;
+    padding: 1.125rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    background: var(--color-background);
+    color: var(--color-on-background);
+    font: inherit;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.hl-card:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    background: var(--color-background-hover);
+}
+
+.hl-card:disabled {
+    cursor: default;
+}
+
+.hl-card img {
+    display: block;
+    width: 100%;
+    max-height: 220px;
+    aspect-ratio: 16 / 9;
+    border-radius: 0.5rem;
+    background: var(--surface-raised);
+    object-fit: cover;
+}
+
+.hl-card strong {
+    font-size: 1.1rem;
+    line-height: 1.35;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.hl-rank {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+.hl-choice {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.hl-versus {
+    align-self: center;
+    padding-inline: 0.25rem;
+    font-weight: 700;
+    opacity: 0.6;
+}
+
+.hl-feedback {
+    margin-block: 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.625rem;
+    background: var(--surface-muted);
+    line-height: 1.6;
+}
+
+.hl-results {
+    width: 100%;
+    max-width: 35rem;
+    margin-block: 1.75rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 0.75rem;
+    background: var(--surface-muted);
+}
+
+.hl-results h2 {
+    margin: 0 0 1rem;
+    line-height: 1.3;
+}
+
+.hl-results p {
+    margin-block: 0.75rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.hl-results button {
+    margin: 0.5rem 0.5rem 0 0;
+}
+
+.hl-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.hl-message {
+    margin-top: 1rem;
+    color: var(--color-error);
+}
+
+/* ========================================
+   RESPONSIVE LAYOUT
+   ======================================== */
+
+@media (max-width: 900px) {
+    body > header {
+        gap: 1rem;
+        padding-inline: 1rem;
+    }
+
+    .page-leaderboard {
+        grid-template-columns: minmax(0, 1fr);
+        width: calc(100% - 1rem);
+    }
+}
+
+@media (max-width: 700px) {
+    .games-page,
+    .page-higher-lower {
+        width: calc(100% - 1.5rem);
+        padding-block: 1.5rem;
+    }
+
+    .games-page .games-hero {
+        margin-bottom: 2rem;
+    }
+
+    .games-page .games-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .games-page a.game-card {
+        min-height: 14rem;
+        padding: 1.25rem;
+    }
+
+    .hl-cards {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.875rem;
+    }
+
+    .hl-versus {
+        text-align: center;
+    }
+
+    .hl-card {
+        min-height: 0;
+    }
+
+    .hl-card img {
+        max-height: 240px;
+    }
+
+    .hl-scoreboard {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hl-results {
+        padding: 1.125rem;
+    }
+
+    .page-leaderboard .board-container,
+    .page-leaderboard .player-container {
+        padding: 0.75rem;
+    }
+
+    .page-leaderboard .board th,
+    .page-leaderboard .board td,
+    .page-leaderboard .player .table td {
+        padding: 0.55rem 0.35rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .hl-scoreboard {
+        gap: 0.625rem;
+    }
+
+    .hl-scoreboard > div {
+        padding: 0.75rem;
+    }
+
+    .hl-scoreboard strong {
+        font-size: 1.5rem;
+    }
+
+    .hl-settings {
+        padding: 1rem;
+    }
+}
+/* Restore the original list page layout */
+main.page-list {
+    display: grid;
+    grid-template-columns: minmax(16rem, 1fr) minmax(16rem, 2fr) minmax(16rem, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: 2rem;
+    height: 0;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+main.page-list > .list-container,
+main.page-list > .level-container,
+main.page-list > .meta-container {
+    min-width: 0;
+    overflow-y: auto;
+}
+
+main.page-list .list-container {
+    padding-inline: 1rem;
+}
+
+main.page-list .level-container .level {
+    max-width: 48rem;
+}
+/* Games page: full-width dark-mode layout */
+main.games-page {
+    display: block;
+    width: 100%;
+    max-width: none;
+    height: 0;
+    min-height: 0;
+    flex: 1;
+    margin: 0;
+    padding: 2rem max(1.5rem, calc((100% - 1100px) / 2));
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    font-family: "Lexend Deca", sans-serif;
+}
+
+/* Keep cards and content within the available width */
+.games-page .games-section,
+.games-page .games-grid {
+    width: 100%;
+    min-width: 0;
+}
+
+.games-page .games-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.games-page .game-card {
+    min-width: 0;
+}
+
+@media (max-width: 700px) {
+    main.games-page {
+        padding: 1.5rem 1rem;
+    }
+
+    .games-page .games-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+/* Higher or Lower: full-width page layout */
+main.page-higher-lower {
+    display: block;
+    width: 100%;
+    max-width: none;
+    height: 0;
+    min-height: 0;
+    flex: 1;
+    margin: 0;
+    padding: 2rem max(1.5rem, calc((100% - 1100px) / 2));
+    overflow-y: auto;
+    box-sizing: border-box;
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    font-family: "Lexend Deca", sans-serif;
+}
+
+.page-higher-lower *,
+.page-higher-lower *::before,
+.page-higher-lower *::after {
+    box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+    main.page-higher-lower {
+        padding: 1.5rem 1rem;
+    }
+}
+
+.account-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100%;
+    padding: 3rem 1rem;
+    box-sizing: border-box;
+}
+
+.account-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 2rem;
+    border: 1px solid var(--color-background-hover);
+    border-radius: 16px;
+    background: var(--color-background);
+    color: var(--color-on-background);
+    box-sizing: border-box;
+}
+
+.account-card h1 {
+    margin-top: 0;
+}
+
+.account-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.account-card input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #888;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font: inherit;
+}
+
+.account-card button {
+    padding: 0.8rem;
+    border: 0;
+    border-radius: 8px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font: inherit;
+    cursor: pointer;
+}
+
+.account-card button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+
+
+/* Full-height leaderboard panels below the header */
+.page-leaderboard-container {
+    height: 0;
+    min-height: 0;
+    flex: 1;
+}
+
+.page-leaderboard {
+    height: calc(100% - 2rem);
+    min-height: 0;
+    margin-block: 1rem;
+    align-items: stretch;
+}
+
+.page-leaderboard .board-container,
+.page-leaderboard .player-container {
+    min-height: 0;
+    max-height: 100%;
+    box-sizing: border-box;
+}
+
+.page-leaderboard .player-container {
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #777 transparent;
+    scroll-behavior: smooth;
+}
+
+/* Keep the player name visible while scrolling */
+.page-leaderboard .player > h1 {
+    position: sticky;
+    top: -1px;
+    z-index: 2;
+    padding-block: 0.5rem;
+    background: var(--color-background);
+}
+/* ========================================
+   ADMIN PANEL
+   ======================================== */
+
+main.admin-page {
+    display: block;
+    width: 100%;
+    height: 0;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+
+    padding: 2rem max(1rem, calc((100% - 1000px) / 2)) 4rem;
+
+    background: var(--color-background);
+    color: var(--color-on-background);
+    font-family: var(--font-main);
+    line-height: 1.5;
+}
+
+.admin-page *,
+.admin-page *::before,
+.admin-page *::after {
+    box-sizing: border-box;
+}
+
+.admin-page h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    line-height: 1.2;
+}
+
+.admin-page h2 {
+    margin: 0 0 0.75rem;
+    font-size: 1.5rem;
+    line-height: 1.3;
+}
+
+.admin-page h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+.admin-page p {
+    margin: 0 0 1rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.admin-page > div > p:first-child {
+    margin-bottom: 1.5rem;
+}
+
+.admin-page .admin-section {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    background: var(--surface-muted);
+}
+
+.admin-page .admin-player {
+    margin: 1rem 0;
+    padding: 1.25rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    background: var(--color-background);
+}
+
+.admin-page .admin-player p {
+    margin-bottom: 0.65rem;
+}
+
+.admin-page .admin-player label {
+    display: block;
+    margin: 1rem 0 0.4rem;
+    font-weight: 600;
+}
+
+.admin-page .admin-player select {
+    width: 100%;
+    min-height: 2.75rem;
+    margin-bottom: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    background: var(--color-background);
+    color: var(--color-on-background);
+}
+
+.admin-page button {
+    min-height: 2.6rem;
+    margin: 0.25rem 0.35rem 0.25rem 0;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font: inherit;
+    cursor: pointer;
+}
+
+.admin-page button:hover:not(:disabled) {
+    filter: brightness(1.1);
+}
+
+.admin-page button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.admin-page button:focus-visible,
+.admin-page select:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+}
+
+.admin-page .admin-player hr {
+    display: none;
+}
+
+.admin-page [role="alert"] {
+    color: var(--color-error);
+}
+
+@media (max-width: 600px) {
+    main.admin-page {
+        padding: 1.25rem 1rem 2rem;
+    }
+
+    .admin-page .admin-section,
+    .admin-page .admin-player {
+        padding: 1rem;
+    }
+}
+
+/* Profile page layout fix */
+
+/* ========================================
+   PROFILE PAGE
+   ======================================== */
+
+.profile-page {
+    display: block !important;
+    width: min(900px, calc(100% - 40px)) !important;
+    max-width: 900px;
+    margin: 32px auto !important;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.profile-page .profile-hero,
+.profile-page .profile-panel {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 20px;
+    padding: 24px;
+    border-radius: 12px;
+}
+
+.profile-page .profile-hero {
+    text-align: left;
+    background: var(--card-background, #171923);
+}
+
+/* Avatar container: always 100 × 100 pixels */
+.profile-page .profile-avatar {
+    position: relative;
+    display: block;
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    min-height: 100px;
+    flex-shrink: 0;
+    margin: 0 0 16px;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+/* Profile picture */
+.profile-page .profile-avatar .profile-avatar-image {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+/* Equipped frame overlay */
+.profile-page .profile-avatar .profile-avatar-frame {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* Profile headings and text */
+.profile-page h1 {
+    margin: 8px 0 12px;
+    font-size: 34px;
+    line-height: 1.2;
+    letter-spacing: -1px;
+}
+
+.profile-page h2 {
+    margin: 8px 0 16px;
+    font-size: 24px;
+    line-height: 1.3;
+    letter-spacing: -0.5px;
+}
+
+.profile-page h3 {
+    font-size: 19px;
+    line-height: 1.35;
+    letter-spacing: 0;
+}
+
+.profile-page p {
+    font-size: 15px;
+    line-height: 1.6;
+    letter-spacing: 0;
+}
+
+.profile-page .profile-username {
+    margin: 8px 0 4px;
+}
+
+.profile-page .profile-eyebrow {
+    font-size: 12px;
+    line-height: 1.5;
+    letter-spacing: 2px;
+}
+
+/* Remove unwanted decorative heading and paragraph pseudo-elements */
+.profile-page h1::before,
+.profile-page h1::after,
+.profile-page h2::before,
+.profile-page h2::after,
+.profile-page h3::before,
+.profile-page h3::after,
+.profile-page p::before,
+.profile-page p::after {
+    display: none;
+}
+
+/* Profile actions */
+.profile-page .profile-actions {
+    justify-content: flex-start;
+}
+
+.profile-page .profile-primary-button,
+.profile-page .profile-secondary-button,
+.profile-page .profile-logout-button {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.profile-page label {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Profile panels */
+.profile-page .profile-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.profile-page .profile-message {
+    margin: 0 0 20px;
+}
+
+/* Quick links */
+.profile-page .profile-quick-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.profile-page .profile-quick-link {
+    min-width: 0;
+}
+
+.profile-page .profile-quick-link strong {
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.profile-page .profile-quick-link small {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Account panel */
+.profile-page .profile-account-panel {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+/* Responsive profile layout */
+@media (max-width: 650px) {
+    .profile-page {
+        width: calc(100% - 24px) !important;
+        margin: 16px auto !important;
+    }
+
+    .profile-page .profile-hero,
+    .profile-page .profile-panel {
+        padding: 18px;
+    }
+
+    .profile-page .profile-quick-links {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .profile-page .profile-account-panel {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 600px) {
+    .profile-page h1 {
+        font-size: 28px;
+    }
+
+    .profile-page h2 {
+        font-size: 21px;
+    }
+}
+
+/* ========================================
+   SUBERBOYS HALLOWEEN THEME
+   Active only when body has halloween-theme
+   ======================================== */
+
+body.halloween-theme {
+    color-scheme: dark;
+    background-color: #100d18;
+    color: #f2eafa;
+    accent-color: #ff8c2a;
+
+    --halloween-bg: #100d18;
+    --halloween-surface: #1b1426;
+    --halloween-surface-raised: #261a35;
+    --halloween-orange: #ff8c2a;
+    --halloween-purple: #a66bdf;
+    --halloween-text: #f2eafa;
+    --halloween-muted: #c0b1d0;
+    --halloween-border: #49315e;
+}
+
+body.halloween-theme #app {
+    min-height: 100vh;
+    background-color: var(--halloween-bg);
+    color: var(--halloween-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.halloween-theme h1,
+body.halloween-theme h2,
+body.halloween-theme h3,
+body.halloween-theme h4,
+body.halloween-theme h5,
+body.halloween-theme h6 {
+    color: var(--halloween-orange);
+    text-shadow: 0 0 14px rgb(255 140 42 / 18%);
+}
+
+body.halloween-theme p,
+body.halloween-theme label,
+body.halloween-theme li {
+    color: var(--halloween-text);
+}
+
+body.halloween-theme a {
+    color: var(--halloween-orange);
+}
+
+body.halloween-theme a:hover {
+    color: #ffc078;
+}
+
+body.halloween-theme button,
+body.halloween-theme input,
+body.halloween-theme select,
+body.halloween-theme textarea {
+    color: var(--halloween-text);
+    background-color: var(--halloween-surface);
+    border-color: var(--halloween-border);
+}
+
+body.halloween-theme button {
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+body.halloween-theme button:hover {
+    border-color: var(--halloween-orange);
+}
+
+body.halloween-theme article,
+body.halloween-theme .pack-card,
+body.halloween-theme .pack-victors,
+body.halloween-theme .packs-filter,
+body.halloween-theme .packs-loading,
+body.halloween-theme .packs-error {
+    background-color: var(--halloween-surface);
+    color: var(--halloween-text);
+    border-color: var(--halloween-border);
+}
+
+body.halloween-theme .pack-card {
+    border: 1px solid var(--halloween-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgb(0 0 0 / 25%);
+}
+
+body.halloween-theme .pack-bonus {
+    color: var(--halloween-orange);
+}
+
+body.halloween-theme .pack-category {
+    color: var(--halloween-purple);
+}
+
+body.halloween-theme hr {
+    border-color: var(--halloween-border);
+}
+
+body.halloween-theme ::selection {
+    color: #100d18;
+    background-color: var(--halloween-orange);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.halloween-theme *,
+    body.halloween-theme *::before,
+    body.halloween-theme *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
+}
+/* Halloween theme overrides normal and dark mode */
+body.halloween-theme {
+    --color-background: #100d18;
+    --color-on-background: #f2eafa;
+    --color-background-hover: #30213f;
+    --color-on-background-hover: #ffffff;
+    --color-primary: #7b2cbf;
+    --color-on-primary: #ffffff;
+    --color-primary-disabled: #49315e;
+    --color-error: #ff6b6b;
+    --color-on-error: #ffffff;
+    --border-subtle: #49315e;
+    --surface-muted: #1b1426;
+    --surface-raised: #261a35;
+
+    color-scheme: dark;
+    background: var(--color-background);
+    color: var(--color-on-background);
+}
+
+/* Keep the site header spooky too */
+body.halloween-theme > header {
+    background: #29133f;
+    color: #ffffff;
+}
+
+body.halloween-theme a {
+    color: #ff9d3d;
+}
+
+body.halloween-theme a:hover {
+    color: #ffc078;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+}
+
+.profile-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Avatar frame customization */
+.profile-frame-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.profile-frame-preview {
+    display: block;
+    width: 100px;
+    height: 100px;
+    flex: 0 0 100px;
+    object-fit: contain;
+}
+
+.profile-frame-info {
+    flex: 1;
+    min-width: 180px;
+}
+
+.profile-frame-info h3 {
+    margin-top: 0;
+}
+
+.profile-frame-info p {
+    overflow-wrap: anywhere;
+}
+.profile-page .profile-hero .profile-avatar {
+    position: relative;
+    display: block;
+    width: 100px;
+    height: 100px;
+    margin: 0 0 16px;
+    overflow: visible;
+}
+
+.profile-page .profile-avatar-image,
+.profile-page .profile-avatar-frame {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.profile-page .profile-avatar-image {
+    z-index: 1;
+}
+
+.profile-page .profile-avatar-frame {
+    z-index: 2;
+    pointer-events: none;
+}
+```css
+/* Avatar frame gallery */
+.profile-frames-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.profile-frame-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+}
+
+.profile-frame-preview-wrap {
+    flex: 0 0 100px;
+    width: 100px;
+    height: 100px;
+}
+
+.profile-frame-preview {
+    display: block;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+}
+
+.profile-frame-info {
+    min-width: 0;
+}
+
+.profile-frame-info h3 {
+    margin: 0 0 6px;
+}
+
+.profile-frame-info p {
+    margin: 4px 0;
+}
+
+@media (max-width: 480px) {
+    .profile-frames-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* Shared circular profile picture */
+.pfp-circle {
+    position: relative;
+    width: var(--pfp-size, 48px);
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+/* Force every uploaded picture into the circle */
+.pfp-circle__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50% !important;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Keep the equipped frame layered over the picture */
+.pfp-circle__frame {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
 }

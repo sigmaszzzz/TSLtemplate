@@ -1,0 +1,26 @@
+{
+  "id": "107538457",
+  "name": "NineFiveOne",
+  "author": "Suberman2",
+  "creators": [
+    "Suberman2"
+  ],
+  "verifier": "Justgame",
+  "verification": "https://www.youtube.com/watch?v=Dr-K6hBqddRRo",
+  "percentToQualify": 100,
+  "password": "Not Copyable",
+  "records": [
+    {
+      "user": "SimmebGaming",
+      "link": "https://youtu.be/-IwYuymggho",
+      "percent": 100,
+      "hz": 360
+    },
+    {
+      "user": "Mothcloakinnit",
+      "link": "https://medal.tv/games/geometry-dash/clips/nOoSEqpqBdD5erlVl?invite=cr-MSxiSG0sNjAxODk1MTU4",
+      "percent": 100,
+      "hz": 60
+    }
+  ]
+}

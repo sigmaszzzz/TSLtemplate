@@ -1,0 +1,31 @@
+{
+    "id": 142771078,
+    "name": "MilestoneIII",
+    "author": "Suberman2",
+    "creators": ["Suberman2"],
+    "verifier": "R3dCorrupt",
+    "verification": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "percentToQualify": 100,
+    "password": "Not Copyable",
+    "records": [
+        {
+            "user": "Suberman2",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 240
+        },
+        {
+            "user": "Mothcloakinnit",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 120
+        },
+        {
+            "user": "Justgame",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 120
+        }
+    ]
+}
+

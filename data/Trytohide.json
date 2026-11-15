@@ -1,0 +1,27 @@
+{
+  "id": "151234523",
+  "name": "Try To Hide",
+  "author": "Suberman2",
+  "creators": [
+    "Suberman2",
+    "Spokko"
+  ],
+  "verifier": "Fawkes",
+  "verification": "https://suberboysdemonlist.siotove1.workers.dev/#/submit",
+  "percentToQualify": 100,
+  "password": "Copyable",
+  "records": [
+    {
+      "user": "Mothcloakinnit",
+      "link": "https://medal.tv/games/geometry-dash/clips/nNYDTR9PZ6kkGvvQI?invite=cr-MSxPRTUsNjAxODk1MTU4",
+      "percent": 100,
+      "hz": 60
+    },
+    {
+      "user": "Justgame",
+      "link": "https://www.youtube.com/watch?v=MZpBIYNtC8M",
+      "percent": 100,
+      "hz": 480
+    }
+  ]
+}

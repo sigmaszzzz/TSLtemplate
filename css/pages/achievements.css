@@ -1,0 +1,544 @@
+
+/* Page layout */
+.achievements-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 24px 48px;
+    box-sizing: border-box;
+}
+
+/* Heading and subtitle */
+.achievements-page h1 {
+    display: block;
+    width: 100%;
+    margin: 0 0 10px;
+    font-size: clamp(2rem, 4vw, 2.7rem);
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+}
+
+.achievements-page > p {
+    display: block;
+    margin: 0 0 28px;
+    font-size: 1rem;
+    line-height: 1.6;
+    opacity: 0.72;
+}
+
+.achievements-page h2 {
+    margin: 28px 0 8px;
+    font-size: 1.5rem;
+}
+
+/* Player selector */
+.achievements-page label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+
+
+
+
+
+.achievements-page select {
+    display: block;
+    width: 100%;
+    max-width: 340px;
+    padding: 12px 14px;
+    border: 1px solid #88888855;
+    border-radius: 10px;
+    background-color: var(--color-background, white);
+    color: var(--color-on-background, black);
+    color-scheme: light;
+    font-family: "Lexend Deca", sans-serif;
+    font-size: 14.2857px;
+    font-weight: 500;
+    line-height: 20px;
+    cursor: pointer;
+}
+
+.achievements-page select option {
+    background-color: var(--color-background, white);
+    color: var(--color-on-background, black);
+    font-family: "Lexend Deca", sans-serif;
+}
+
+/* Use the native dark dropdown appearance when dark mode is active */
+main.dark .achievements-page select {
+    color-scheme: dark;
+}
+/* Progress summary */
+.achievement-summary {
+    max-width: 460px;
+    margin-top: 18px;
+}
+
+.achievement-summary p {
+    margin: 0 0 10px;
+    line-height: 1.5;
+}
+
+.achievement-progress {
+    height: 9px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #88888825;
+}
+
+.achievement-progress__fill {
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #39c6e6, #9274f5);
+    transition: width 0.25s ease;
+}
+
+/* Achievement grid */
+.achievement-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+}
+
+/* Base card */
+.achievement-card {
+    --tier-color: #9ca3af;
+    --tier-bg: rgba(156, 163, 175, 0.09);
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+    min-height: 210px;
+    padding: 20px;
+    overflow: hidden;
+    border: 1px solid var(--tier-color);
+    border-radius: 14px;
+    border-top: 3px solid var(--tier-color);
+    background: var(--tier-bg);
+    text-align: left;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.achievement-card:not(.is-locked):hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px var(--tier-bg);
+}
+
+/* Icon */
+.achievement-icon {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    margin-bottom: 16px;
+    border: 1px solid var(--tier-color);
+    border-radius: 13px;
+    background: var(--tier-bg);
+    font-size: 25px;
+}
+
+/* Card text */
+.achievement-card h3 {
+    margin: 0 0 7px;
+    font-size: 1.05rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.achievement-card > p {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    opacity: 0.8;
+}
+
+.achievement-tier {
+    display: inline-block;
+    margin-top: auto;
+    padding: 5px 10px;
+    border: 1px solid var(--tier-color);
+    border-radius: 7px;
+    background: var(--tier-bg);
+    color: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.achievement-card .achievement-status {
+    margin-top: 12px;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.achievement-card:not(.is-locked) .achievement-status {
+    color: var(--tier-color);
+}
+
+/* Tier colours */
+.tier-bronze {
+    --tier-color: #bd7948;
+    --tier-bg: rgba(189, 121, 72, 0.12);
+}
+
+.tier-silver {
+    --tier-color: #8795a8;
+    --tier-bg: rgba(135, 149, 168, 0.14);
+}
+
+.tier-gold {
+    --tier-color: #d7a514;
+    --tier-bg: rgba(245, 190, 35, 0.15);
+}
+
+.tier-diamond {
+    --tier-color: #18a9c7;
+    --tier-bg: rgba(35, 198, 225, 0.14);
+}
+
+.tier-platinum {
+    --tier-color: #8374e8;
+    --tier-bg: rgba(139, 124, 246, 0.14);
+}
+
+.tier-legendary {
+    --tier-color: #b04bdf;
+    --tier-bg: rgba(194, 91, 240, 0.15);
+}
+
+/* Locked achievements */
+.achievement-card.is-locked {
+    opacity: 0.55;
+}
+
+.achievement-card.is-locked .achievement-icon {
+    filter: grayscale(1);
+}
+
+/* Loading state */
+.achievements-loading {
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+/* Responsive layout */
+@media (max-width: 850px) {
+    .achievement-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 540px) {
+    .achievements-page {
+        padding: 24px 16px 36px;
+    }
+
+    .achievement-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .achievement-card {
+        min-height: 185px;
+        padding: 18px;
+    }
+
+    .achievements-page select {
+        max-width: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .achievement-card {
+        transition: none;
+    }
+
+    .achievement-card:not(.is-locked):hover {
+        transform: none;
+    }
+
+    .achievement-progress__fill {
+        transition: none;
+    }
+}
+
+/* ==================================
+   ACHIEVEMENT RARITY EFFECTS
+   Bronze < Silver < Gold < Diamond
+   < Platinum < Legendary
+================================== */
+
+/* Shared setup */
+.achievement-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-top-width: 3px;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+/* Bronze — subtle copper glow */
+.achievement-card.tier-bronze:not(.is-locked) {
+    box-shadow: 0 3px 10px #bd794820;
+}
+
+.achievement-card.tier-bronze:not(.is-locked):hover {
+    box-shadow: 0 6px 18px #bd794850;
+}
+
+/* Silver — metallic shine */
+.achievement-card.tier-silver:not(.is-locked) {
+    box-shadow: 0 3px 12px #aab7c72b;
+}
+
+.achievement-card.tier-silver:not(.is-locked):hover {
+    box-shadow: 0 6px 22px #aab7c760;
+}
+
+/* Gold — warm golden glow */
+.achievement-card.tier-gold:not(.is-locked) {
+    box-shadow:
+        0 0 12px #e8b92330,
+        inset 0 0 18px #e8b9230c;
+}
+
+.achievement-card.tier-gold:not(.is-locked):hover {
+    box-shadow:
+        0 0 18px #e8b92365,
+        inset 0 0 24px #e8b92315;
+}
+
+/* Diamond — icy cyan glow */
+.achievement-card.tier-diamond:not(.is-locked) {
+    box-shadow:
+        0 0 14px #35cde535,
+        inset 0 0 20px #35cde510;
+}
+
+.achievement-card.tier-diamond:not(.is-locked):hover {
+    box-shadow:
+        0 0 25px #35cde580,
+        inset 0 0 28px #35cde520;
+}
+
+/* Platinum — shifting blue and violet shine */
+.achievement-card.tier-platinum:not(.is-locked) {
+    background:
+        linear-gradient(135deg, #9b91f51b, #62c9f01b, #9b91f51b);
+    background-size: 200% 200%;
+    animation: platinum-shimmer 5s ease-in-out infinite;
+    box-shadow: 0 0 18px #9b91f540;
+}
+
+.achievement-card.tier-platinum:not(.is-locked):hover {
+    box-shadow:
+        0 0 28px #9b91f580,
+        0 0 42px #62c9f030;
+}
+
+@keyframes platinum-shimmer {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Legendary — animated purple aura */
+.achievement-card.tier-legendary:not(.is-locked) {
+    background:
+        linear-gradient(135deg, #d16bff20, #853bdf20, #f06bc920);
+    background-size: 250% 250%;
+    animation: legendary-aura 4s ease-in-out infinite;
+    box-shadow:
+        0 0 18px #d16bff50,
+        0 0 35px #853bdf20;
+}
+
+.achievement-card.tier-legendary:not(.is-locked):hover {
+    box-shadow:
+        0 0 28px #d16bff90,
+        0 0 48px #853bdf50;
+}
+
+@keyframes legendary-aura {
+    0%, 100% {
+        background-position: 0% 50%;
+        box-shadow: 0 0 18px #d16bff45, 0 0 35px #853bdf20;
+    }
+    50% {
+        background-position: 100% 50%;
+        box-shadow: 0 0 26px #d16bff75, 0 0 42px #853bdf35;
+    }
+}
+
+/* Make the rarity badge glow too */
+.achievement-card:not(.is-locked) .achievement-tier {
+    box-shadow: 0 0 10px var(--tier-bg);
+}
+
+.achievement-card.tier-gold:not(.is-locked) .achievement-tier {
+    box-shadow: 0 0 12px #e8b92345;
+}
+
+.achievement-card.tier-diamond:not(.is-locked) .achievement-tier {
+    box-shadow: 0 0 14px #35cde550;
+}
+
+.achievement-card.tier-platinum:not(.is-locked) .achievement-tier {
+    box-shadow: 0 0 16px #9b91f570;
+}
+
+.achievement-card.tier-legendary:not(.is-locked) .achievement-tier {
+    box-shadow: 0 0 20px #d16bff80;
+}
+
+/* Respect reduced-motion settings */
+@media (prefers-reduced-motion: reduce) {
+    .achievement-card.tier-platinum:not(.is-locked),
+    .achievement-card.tier-legendary:not(.is-locked) {
+        animation: none;
+    }
+}
+
+/* Dark mode adjustments */
+.dark .achievements-page select,
+body.dark .achievements-page select {
+    background-color: #25252b;
+    color: #f5f5f5;
+    border-color: #555561;
+}
+
+.dark .achievements-page select option,
+body.dark .achievements-page select option {
+    background-color: #25252b;
+    color: #f5f5f5;
+}
+
+.dark .achievement-card,
+body.dark .achievement-card {
+    color: #f0f0f4;
+}
+
+.dark .achievement-card .achievement-tier,
+body.dark .achievement-card .achievement-tier {
+    color: var(--tier-color);
+}
+
+.dark .achievement-progress,
+body.dark .achievement-progress {
+    background: #ffffff20;
+}
+
+
+.achievements-page {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 24px 48px;
+    box-sizing: border-box;
+    background: transparent;
+    color: var(--color-on-background, inherit);
+}
+
+/* Fill the page with the active theme background */
+main > div:has(.achievements-page) {
+    background-color: var(--color-background);
+}
+
+.achievements-page {
+    min-height: 100%;
+    box-sizing: border-box;
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+}
+/* Theme background for the achievements page only */
+main.dark .achievements-page {
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+}
+
+main:not(.dark) .achievements-page {
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+}
+/* Achievements page theme */
+.achievements-page {
+    background-color: var(--color-background, white);
+    color: var(--color-on-background, black);
+    min-height: 100%;
+    box-sizing: border-box;
+}
+
+.achievements-page.dark {
+    --color-background: #1c1b1f;
+    --color-on-background: #ffffff;
+
+    background-color: #1c1b1f;
+    color: #ffffff;
+}
+
+/* Ensure the full scrollable achievements area is dark */
+.achievements-page.dark select {
+    background-color: #25252b;
+    color: #ffffff;
+    color-scheme: dark;
+}
+
+.achievements-page.dark select option {
+    background-color: #25252b;
+    color: #ffffff;
+}
+/* Match the Packs tab's full-page background */
+main.achievements-page {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+    background-color: var(--color-background, white);
+    color: var(--color-on-background, black);
+}
+
+main.achievements-page.dark {
+    background-color: #1c1b1f;
+    color: #ffffff;
+}
+/* Match the Packs page layout and background */
+main.achievements-page {
+    display: block;
+    width: 100%;
+    max-width: none;
+    height: 0;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    box-sizing: border-box;
+
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+}
+
+/* Dark mode background */
+body:has(main.achievements-page.dark),
+body:has(main.achievements-page.dark) #app {
+    background-color: #121114;
+}
+
+main.achievements-page.dark {
+    --color-background: #1c1b1f;
+    --color-on-background: #ffffff;
+    background-color: #1c1b1f;
+    color: #ffffff;
+}

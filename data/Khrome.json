@@ -1,0 +1,62 @@
+
+{
+    "id": 104646952,
+    "name": "Khrome",
+    "author": "Zaynem12",
+    "creators": ["Zaynem12"],
+    "verifier": "Suberman2",
+    "verification": "https://youtu.be/keE6fBzo0Vs",
+    "percentToQualify": 100,
+    "password": "Not Copyable",
+    "records": [
+        {
+            "user": "Zaynem12",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 360
+        },
+        {
+            "user": "R3dcorrupt",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 180
+        },
+        {
+            "user": "JJgamingGMD",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 2
+        },
+        {
+            "user": "Mothcloakinnit",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 140
+        },
+        {
+            "user": "Justgame",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 120
+        },
+        {
+            "user": "Paperalizado",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 60
+        },
+        {
+            "user": "XKuba",
+            "link": "https://www.youtube.com/watch?v=invalid",
+            "percent": 100,
+            "hz": 120
+        },
+        {
+      "user": "SimmebGaming",
+      "link": "https://youtu.be/_FsZFmc-OJo",
+      "percent": 100,
+      "hz": 120
+    }
+    ]
+}
+

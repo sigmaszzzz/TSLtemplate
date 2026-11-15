@@ -1,0 +1,26 @@
+{
+  "id": "95215991",
+  "name": "Spookweiner",
+  "author": "Suberman2",
+  "creators": [
+    "Suberman2"
+  ],
+  "verifier": "Suberman2",
+  "verification": "https://www.youtube.com/@DailyDoseGD/videos",
+  "percentToQualify": 66,
+  "password": "Not Copyable",
+  "records": [
+    {
+      "user": "Justgame",
+      "link": "https://youtu.be/ad8qpqTQXrI",
+      "percent": 100,
+      "hz": 240
+    },
+    {
+      "user": "Mothcloakinnit",
+      "link": "https://medal.tv/games/geometry-dash/clips/nNYRWIvMfFOBjKhko?invite=cr-MSw1N0gsNjAxODk1MTU4",
+      "percent": 100,
+      "hz": 60
+    }
+  ]
+}

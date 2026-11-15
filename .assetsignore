@@ -1,0 +1,21 @@
+.git/
+.github/
+.wrangler/
+worker.js
+worker.js.map
+submission-routes.js
+submissions.js
+wrangler.jsonc
+migrations/
+.assetsignore
+.gitignore
+.editorconfig
+README.md
+SECURITY.md
+rank-history-quests-worker.js
+community-features-worker.js
+
+# Server-side Worker modules (bundled into worker.js, not public assets)
+/competition-platform-worker.js
+/community-features-worker.js
+/rank-history-quests-worker.js

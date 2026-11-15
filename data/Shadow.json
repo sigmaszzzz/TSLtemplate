@@ -1,0 +1,38 @@
+{
+  "id": "113361943",
+  "name": "Th3 Sh4dow",
+  "author": "R3dcorrupt",
+  "creators": [
+    "Suberman2, Timsuperial, R3dcorrupt"
+  ],
+  "verifier": "Justgame",
+  "verification": "https://youtu.be/vHVM-a7TPrs?si=QG2mHDNeuLrEbnh1",
+  "percentToQualify": 100,
+  "password": "Not Copyable",
+  "records": [
+    {
+      "user": "Suberman2",
+      "link": "https://www.youtube.com/watch?v=invalid",
+      "percent": 100,
+      "hz": 420
+    },
+    {
+      "user": "Feavo228",
+      "link": "https://bread.com",
+      "percent": 100,
+      "hz": 360
+    },
+    {
+      "user": "Mothcloakinnit",
+      "link": "https://medal.tv/games/geometry-dash/clips/nMnrMtrnw6cRwmy2C?invite=cr-MSxtTDksNjAxODk1MTU4",
+      "percent": 100,
+      "hz": 60
+    },
+    {
+      "user": "R3dcorrupt",
+      "link": "https://youalrknowibeatit.com",
+      "percent": 100,
+      "hz": 240
+    }
+  ]
+}

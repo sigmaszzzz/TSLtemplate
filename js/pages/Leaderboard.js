@@ -1,6 +1,7 @@
 import { fetchLeaderboard } from '../content.js';
 import { localize } from '../util.js';
-
+import { getAchievements } from '../achievements.js';
+import { countryFlag, countryName } from '../profile-customization-options.js';
 import Spinner from '../components/Spinner.js';
 
 export default {
@@ -8,10 +9,14 @@ export default {
         Spinner,
     },
     data: () => ({
-        leaderboard: [],
-        loading: true,
-        selected: 0,
-        err: [],
+    leaderboard: [],
+    loading: true,
+    avatarProfiles: [],
+    movementByName: {},
+    movementSnapshotDate: '',
+    selected: 0,
+    sortBy: 'points',
+    err: [],
     }),
     template: `
         <main v-if="loading">
@@ -25,21 +30,77 @@ export default {
                     </p>
                 </div>
                 <div class="board-container">
+                <competition-season-widget :players="leaderboard"></competition-season-widget>
+                <player-goals-widget></player-goals-widget>
+                <div class="leaderboard-controls">
+    <label for="leaderboard-sort">Sort by:</label>
+    <select id="leaderboard-sort" v-model="sortBy"
+        @change="selected = 0">
+        <option value="points">Most Points</option>
+        <option value="verified">Most Verified Levels</option>
+        <option value="completed">Most Completed Levels</option>
+        <option value="progressed">Most Progressed Levels</option>
+        <option value="packs">Most Packs Beaten</option>
+        <option value="achievements">Most Achievements</option>
+<option value="rarest">Rarest Achievements</option>
+    </select>
+</div>
                     <table class="board">
-                        <tr v-for="(ientry, i) in leaderboard">
-                            <td class="rank">
-                                <p class="type-label-lg">#{{ i + 1 }}</p>
-                            </td>
-                            <td class="total">
-                                <p class="type-label-lg">{{ localize(ientry.total) }}</p>
-                            </td>
-                            <td class="user" :class="{ 'active': selected == i }">
-                                <button @click="selected = i">
-                                    <span class="type-label-lg">{{ ientry.user }}</span>
-                                </button>
-                            </td>
-                        </tr>
-                    </table>
+    <tr>
+        <th>Rank</th>
+        <th>{{ valueHeading }}</th>
+        <th>Player</th>
+    </tr>
+    <tr v-for="(ientry, i) in sortedLeaderboard" :key="ientry.user">
+        <td class="rank">
+            <p class="type-label-lg">#{{ i + 1 }}
+                <span v-if="sortBy === 'points' && movementFor(ientry.user, i + 1).change !== null"
+                    class="competition-rank-change"
+                    :class="{ 'is-up': movementFor(ientry.user, i + 1).change > 0, 'is-down': movementFor(ientry.user, i + 1).change < 0, 'is-flat': movementFor(ientry.user, i + 1).change === 0 }"
+                    :title="'Previous rank: #' + movementFor(ientry.user, i + 1).previousRank">
+                    {{ movementFor(ientry.user, i + 1).change > 0 ? '▲ ' + movementFor(ientry.user, i + 1).change : (movementFor(ientry.user, i + 1).change < 0 ? '▼ ' + Math.abs(movementFor(ientry.user, i + 1).change) : '—') }}
+                </span>
+            </p>
+        </td>
+        <td class="total">
+            <p class="type-label-lg">{{ rankingValue(ientry) }}</p>
+        </td>
+        <td class="user" :class="{ active: selected === i }">
+    <button
+        class="leaderboard-player-button"
+        @click="selected = i"
+    >
+        <span class="leaderboard-avatar">
+            <img
+                class="leaderboard-avatar-pfp"
+                :src="avatarFor(ientry).pfp"
+                alt=""
+                width="48"
+                height="48"
+            >
+            <img
+                v-if="avatarFor(ientry).frame"
+                class="leaderboard-avatar-frame"
+                :src="avatarFor(ientry).frame"
+                alt=""
+                width="48"
+                height="48"
+            >
+        </span>
+
+        <span class="leaderboard-player-details">
+            <span class="type-label-lg">{{ avatarFor(ientry).displayName || ientry.user }}</span>
+            <span v-if="avatarFor(ientry).profileTitle" class="leaderboard-player-title" :style="{ color: avatarFor(ientry).accentColor }">{{ avatarFor(ientry).profileTitle }}</span>
+            <span class="leaderboard-player-meta">
+                <span v-if="avatarFor(ientry).countryCode">{{ countryFlag(avatarFor(ientry).countryCode) }} {{ countryName(avatarFor(ientry).countryCode) }}</span>
+                <span v-if="avatarFor(ientry).clanName">{{ avatarFor(ientry).clanTag ? '[' + avatarFor(ientry).clanTag + '] ' : '' }}{{ avatarFor(ientry).clanName }}{{ avatarFor(ientry).clanRole ? ' · ' + avatarFor(ientry).clanRole : '' }}</span>
+            </span>
+        </span>
+    </button>
+    <router-link class="leaderboard-profile-shortcut" :to="playerProfileRoute(ientry.user)" @click.stop>Profile ↗</router-link>
+</td>
+    </tr>
+</table>
                 </div>
                 <div class="player-container">
                     <div class="player">
@@ -87,24 +148,218 @@ export default {
                                 </td>
                             </tr>
                         </table>
+                        <h2 v-if="entry.packsBeaten && entry.packsBeaten.length > 0">
+    Packs Beaten ({{ entry.packsBeaten.length }})
+</h2>
+<table class="table" v-if="entry.packsBeaten && entry.packsBeaten.length > 0">
+    <tr v-for="pack in entry.packsBeaten" :key="pack.id">
+        <td class="level">
+            <span class="type-label-lg">{{ pack.name }}</span>
+        </td>
+        <td class="score">
+            <p>+{{ localize(pack.bonus) }}</p>
+        </td>
+    </tr>
+</table>
                     </div>
                 </div>
             </div>
         </main>
     `,
     computed: {
-        entry() {
-            return this.leaderboard[this.selected];
-        },
+    valueHeading() {
+        switch (this.sortBy) {
+            case 'verified': return 'Verified';
+            case 'completed': return 'Completed';
+            case 'progressed': return 'Progressed';
+            case 'packs': return 'Packs Beaten';
+            case 'achievements': return 'Achievements';
+            case 'rarest': return 'Rarity Score';
+            default: return 'Points';
+        }
     },
-    async mounted() {
+
+    sortedLeaderboard() {
+        const count = (player, key) =>
+            Array.isArray(player[key]) ? player[key].length : 0;
+
+        return [...this.leaderboard].sort((a, b) => {
+            let difference;
+
+            switch (this.sortBy) {
+                case 'verified':
+                    difference = count(b, 'verified') - count(a, 'verified');
+                    break;
+                case 'completed':
+                    difference = count(b, 'completed') - count(a, 'completed');
+                    break;
+                case 'progressed':
+                    difference = count(b, 'progressed') - count(a, 'progressed');
+                    break;
+                case 'packs':
+                    difference = count(b, 'packsBeaten') - count(a, 'packsBeaten');
+                    break;
+                case 'achievements':
+                    difference = this.achievementCount(b) - this.achievementCount(a);
+                    break;
+                case 'rarest':
+                    difference = this.rarityScore(b) - this.rarityScore(a);
+                    break;
+                default:
+                    difference = (Number(b.total) || 0) - (Number(a.total) || 0);
+            }
+
+            // Use points to break ties.
+            return difference || (Number(b.total) || 0) - (Number(a.total) || 0);
+        });
+    },
+
+        entry() {
+        return this.sortedLeaderboard[this.selected] || {
+            user: 'No players',
+            total: 0,
+            verified: [],
+            completed: [],
+            progressed: [],
+            packsBeaten: [],
+        };
+    },
+},
+
+
+async mounted() {
+    try {
         const [leaderboard, err] = await fetchLeaderboard();
+
         this.leaderboard = leaderboard;
         this.err = err;
-        // Hide loading spinner
+
+        const response = await fetch(
+            '/api/leaderboard/avatar-frames',
+            {
+                credentials: 'same-origin',
+                cache: 'no-store',
+            }
+        );
+
+        if (response.ok) {
+            const result = await response.json();
+            this.avatarProfiles = result.profiles || [];
+        }
+        try {
+            const movementResponse = await fetch('/api/competition/movements', { credentials: 'same-origin', cache: 'no-store' });
+            if (movementResponse.ok) {
+                const movementResult = await movementResponse.json();
+                this.movementByName = movementResult.previousRanks || {};
+                this.movementSnapshotDate = movementResult.previousDate || '';
+            }
+        } catch (movementError) {
+            console.warn('Could not load rank movement:', movementError);
+        }
+    } catch (error) {
+        console.error('Could not load leaderboard:', error);
+    } finally {
         this.loading = false;
+    }
+},
+
+methods: {
+     movementFor(playerName, currentRank) {
+         const key = String(playerName || '').trim().toLocaleLowerCase('en');
+         const previous = this.movementByName[key];
+         if (!previous || !Number.isFinite(Number(previous.rank))) return { change: null, previousRank: null };
+         return { change: Number(previous.rank) - Number(currentRank), previousRank: Number(previous.rank) };
+     },
+     countryFlag,
+     countryName,
+     playerProfileRoute(playerName) {
+         return '/players/' + encodeURIComponent(String(playerName || ''));
+     },
+     localize,
+
+    avatarFor(player) {
+        const profile = this.avatarProfiles.find(
+            item =>
+                item.leaderboard_name?.toLocaleLowerCase('en') ===
+                player.user?.toLocaleLowerCase('en')
+        );
+
+        const frames = {
+            angy: '/assets/profile/Angy.png',
+            appi: '/assets/profile/Appi.png',
+            borgir: '/assets/profile/Borgir.png',
+            bronze: '/assets/profile/Bronze.png',
+            cool: '/assets/profile/Cool.png',
+            diamond: '/assets/profile/Diamond.png',
+            fire: '/assets/profile/Fire%20Frame.png',
+            furter: '/assets/profile/Furter.png',
+            gold: '/assets/profile/Gold.png',
+            hidrog: '/assets/profile/Hidrog.png',
+            honeycomb: '/assets/profile/Honeycomb.png',
+            legendary: '/assets/profile/Legendary.png',
+            platinum: '/assets/profile/Platinum.png',
+            polish: '/assets/profile/Polish.png',
+            punpkin: '/assets/profile/Punpkin.png',
+            ssjjasaiah: '/assets/profile/SSJJasaiah.png',
+            silver: '/assets/profile/Silver.png',
+            victory: '/assets/profile/Victory.png',
+            wjat: '/assets/profile/Wjat.png',
+            gartyen: '/assets/profile/gartyen.png',
+        };
+
+        return {
+            pfp: profile?.avatar_url || '/assets/profile/No%20PFP.png',
+            frame: profile?.frame_url || frames[profile?.equipped_frame] || null,
+            displayName: profile?.display_name || '',
+            countryCode: profile?.country_code || '',
+            clanName: profile?.clan_name || '',
+            clanTag: profile?.clan_tag || '',
+            profileTitle: profile?.profile_title || '',
+            accentColor: profile?.accent_color || '#a855f7',
+        };
     },
-    methods: {
-        localize,
+
+    achievementCount(player) {
+        return getAchievements(player).filter(
+            achievement => achievement.unlocked
+        ).length;
     },
+
+    rarityScore(player) {
+        const unlocked = getAchievements(player).filter(
+            achievement => achievement.unlocked
+        );
+
+        if (this.leaderboard.length === 0) return 0;
+
+        return unlocked.reduce((score, achievement) => {
+            const holders = this.leaderboard.filter(other =>
+                getAchievements(other).some(item =>
+                    item.id === achievement.id && item.unlocked
+                )
+            ).length;
+
+            return score + (1 / Math.max(holders, 1));
+        }, 0);
+    },
+
+    rankingValue(player) {
+        switch (this.sortBy) {
+            case 'verified':
+                return player.verified?.length || 0;
+            case 'completed':
+                return player.completed?.length || 0;
+            case 'progressed':
+                return player.progressed?.length || 0;
+            case 'packs':
+                return player.packsBeaten?.length || 0;
+            case 'achievements':
+                return this.achievementCount(player);
+            case 'rarest':
+                return this.rarityScore(player).toFixed(2);
+            default:
+                return localize(player.total);
+        }
+    },
+},
 };

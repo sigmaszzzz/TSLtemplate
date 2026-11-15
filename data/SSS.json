@@ -1,0 +1,27 @@
+{
+  "id": "151237882",
+  "name": "Spooky Scary Skelles",
+  "author": "Suberman2",
+  "creators": [
+    "Suberman2",
+    "Spokko"
+  ],
+  "verifier": "Fawkes",
+  "verification": "https://suberboysdemonlist.siotove1.workers.dev/#/submit",
+  "percentToQualify": 100,
+  "password": "Copyable",
+  "records": [
+    {
+      "user": "Justgame",
+      "link": "https://studio.youtube.com/video/BMt1w7LYQj4/edit",
+      "percent": 100,
+      "hz": 240
+    },
+    {
+      "user": "Mothcloakinnit",
+      "link": "https://medal.tv/games/geometry-dash/clips/nNXEyeho52VbTeUJ2?invite=cr-MSxEdUosNjAxODk1MTU4",
+      "percent": 100,
+      "hz": 60
+    }
+  ]
+}

@@ -126,3 +126,132 @@
 .page-list .meta .editors li a:hover {
     text-decoration: underline;
 }
+/* Gold — hardest level */
+.page-list .list .rank-gold,
+.page-list .list .rank-gold .type-label-lg,
+.page-list .list .level.rank-gold button,
+.page-list .list .level.rank-gold button .type-label-lg,
+.page-list .list .level.rank-gold.active button,
+.page-list .list .level.rank-gold button:hover {
+    color: #ffd700 !important;
+}
+
+/* Silver — second hardest */
+.page-list .list .rank-silver,
+.page-list .list .rank-silver .type-label-lg,
+.page-list .list .level.rank-silver button,
+.page-list .list .level.rank-silver button .type-label-lg,
+.page-list .list .level.rank-silver.active button,
+.page-list .list .level.rank-silver button:hover {
+    color: #c0c0c0 !important;
+}
+
+/* Bronze — third hardest */
+.page-list .list .rank-bronze,
+.page-list .list .rank-bronze .type-label-lg,
+.page-list .list .level.rank-bronze button,
+.page-list .list .level.rank-bronze button .type-label-lg,
+.page-list .list .level.rank-bronze.active button,
+.page-list .list .level.rank-bronze button:hover {
+    color: #cd7f32 !important;
+}
+
+
+/* Subtle historical list controls */
+.page-list .historical-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.page-list .historical-controls label {
+    font-family: "Lexend Deca", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+.page-list .historical-controls select,
+.page-list .historical-controls button {
+    font-family: "Lexend Deca", sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    background: transparent;
+    color: var(--color-on-background);
+    border: 1px solid var(--color-background-hover);
+    border-radius: 0.4rem;
+    padding: 0.4rem 0.6rem;
+    max-width: 100%;
+}
+
+.page-list .historical-controls select {
+    cursor: pointer;
+}
+
+.page-list .historical-controls button {
+    cursor: pointer;
+    opacity: 0.75;
+}
+
+.page-list .historical-controls select:hover,
+.page-list .historical-controls button:hover {
+    background-color: var(--color-background-hover);
+    opacity: 1;
+}
+
+.page-list .historical-controls .history-label {
+    width: 100%;
+    margin: 0;
+    font-family: "Lexend Deca", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.55;
+}
+
+/* Subtle rank movement indicators */
+.page-list .rank-change {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-family: "Lexend Deca", sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0.8;
+}
+
+.page-list .rank-change.up {
+    color: #22a06b;
+}
+
+.page-list .rank-change.down {
+    color: #e05252;
+}
+
+.page-list .rank-change.new {
+    color: var(--color-primary);
+    font-size: 10px;
+}
+
+.page-list .rank-change.same {
+    opacity: 0.35;
+}
+
+.account-footer {
+    grid-column: 1 / -1;
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.account-footer a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.account-footer a:hover {
+    text-decoration: underline;
+}

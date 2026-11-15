@@ -1,0 +1,21 @@
+{
+  "id": "90552780",
+  "name": "Wobbly Tooth",
+  "author": "Suberman2",
+  "creators": [
+    "Suberman2",
+    "Riot"
+  ],
+  "verifier": "Suberman2",
+  "verification": "https://suberboysdemonlist.siotove1.workers.dev/#/submit",
+  "percentToQualify": 100,
+  "password": "Not Copyable",
+  "records": [
+    {
+      "user": "Justgame",
+      "link": "https://studio.youtube.com/video/a4fWd2nDtwY/edit",
+      "percent": 100,
+      "hz": 480
+    }
+  ]
+}

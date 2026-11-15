@@ -1,0 +1,182 @@
+
+name: Backfill level archive
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Backfill snapshots and changes
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const { execFileSync } = require('child_process');
+
+          const dir = 'archive/snapshots';
+          const indexPath = 'archive/index.json';
+          const changesPath = 'archive/changes.json';
+
+          fs.mkdirSync(dir, { recursive: true });
+          fs.mkdirSync('archive', { recursive: true });
+
+          let index = [];
+
+          if (fs.existsSync(indexPath)) {
+            try {
+              index = JSON.parse(fs.readFileSync(indexPath, 'utf8'));
+            } catch (error) {
+              throw new Error(
+                `Invalid JSON in ${indexPath}: ${error.message}`
+              );
+            }
+          }
+
+          if (!Array.isArray(index)) {
+            throw new Error(`${indexPath} must contain a JSON array.`);
+          }
+
+          const known = new Set(index.map(item => item.commit));
+
+          const output = execFileSync(
+            'git',
+            ['log', '--reverse', '--format=%H', '--', 'data/_list.json'],
+            { encoding: 'utf8' }
+          );
+
+          const commits = output.trim().split('\n').filter(Boolean);
+
+          for (const sha of commits) {
+            if (known.has(sha)) continue;
+
+            const timestamp = execFileSync(
+              'git', ['show', '-s', '--format=%cI', sha],
+              { encoding: 'utf8' }
+            ).trim();
+
+            const raw = execFileSync(
+              'git', ['show', `${sha}:data/_list.json`],
+              { encoding: 'utf8' }
+            );
+
+            let levels;
+
+            try {
+              levels = JSON.parse(raw);
+            } catch (error) {
+              console.log(
+                `Skipping malformed historical JSON in commit ${sha}: ${error.message}`
+              );
+              continue;
+            }
+
+            if (!Array.isArray(levels) ||
+                !levels.every(level => typeof level === 'string')) {
+              console.log(
+                `Skipping invalid level-list format in commit ${sha}`
+              );
+              continue;
+            }
+
+            const date = new Date(timestamp).toISOString().slice(0, 10);
+            const filename = `${date}-${sha.slice(0, 7)}.json`;
+            const relativeFile = `snapshots/${filename}`;
+            const fullPath = path.join('archive', relativeFile);
+
+            fs.writeFileSync(
+              fullPath,
+              JSON.stringify(levels, null, 2) + '\n'
+            );
+
+            index.push({
+              date: timestamp,
+              commit: sha,
+              file: relativeFile
+            });
+
+            known.add(sha);
+          }
+
+          index.sort((a, b) =>
+            a.date.localeCompare(b.date) ||
+            a.commit.localeCompare(b.commit)
+          );
+
+          const readLevels = item => {
+            const file = path.join('archive', item.file);
+
+            if (!fs.existsSync(file)) {
+              throw new Error(`Missing snapshot file: ${file}`);
+            }
+
+            const levels = JSON.parse(fs.readFileSync(file, 'utf8'));
+
+            if (!Array.isArray(levels)) {
+              throw new Error(`Snapshot is not an array: ${file}`);
+            }
+
+            return levels;
+          };
+
+          const changes = index.map((item, i) => {
+            const current = readLevels(item);
+            const previous = i ? readLevels(index[i - 1]) : [];
+
+            const currentSet = new Set(current);
+            const previousSet = new Set(previous);
+
+            const added = current.filter(x => !previousSet.has(x));
+            const removed = previous.filter(x => !currentSet.has(x));
+
+            const moved = current
+              .filter(x => previousSet.has(x))
+              .filter(x => previous.indexOf(x) !== current.indexOf(x))
+              .map(level => ({
+                level,
+                from: previous.indexOf(level) + 1,
+                to: current.indexOf(level) + 1
+              }));
+
+            return {
+              date: item.date,
+              commit: item.commit,
+              added,
+              removed,
+              moved
+            };
+          });
+
+          fs.writeFileSync(
+            indexPath,
+            JSON.stringify(index, null, 2) + '\n'
+          );
+
+          fs.writeFileSync(
+            changesPath,
+            JSON.stringify(changes, null, 2) + '\n'
+          );
+
+          console.log(`Archive now contains ${index.length} snapshots.`);
+          NODE
+
+      - name: Commit backfilled archive
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add archive/
+          if git diff --cached --quiet; then
+            echo "Archive is already up to date."
+          else
+            git commit -m "Backfill historical level archive"
+            git push
+          fi

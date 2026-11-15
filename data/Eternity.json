@@ -1,0 +1,26 @@
+{
+  "id": "66932665",
+  "name": "Eternity",
+  "author": "Suberman2",
+  "creators": [
+    "Suberman2"
+  ],
+  "verifier": "Justgame",
+  "verification": "https://www.youtube.com/watch?v=Dr-K6hBqddRRo",
+  "percentToQualify": 100,
+  "password": "Not Copyable",
+  "records": [
+    {
+      "user": "SimmebGaming",
+      "link": "https://youtu.be/vvTqFu27A0w",
+      "percent": 100,
+      "hz": 360
+    },
+    {
+      "user": "Mothcloakinnit",
+      "link": "https://medal.tv/games/geometry-dash/clips/nO03a5F2Sp17yGLMI?invite=cr-MSw0ZkIsNjAxODk1MTU4",
+      "percent": 100,
+      "hz": 60
+    }
+  ]
+}

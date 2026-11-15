@@ -46,79 +46,190 @@ export async function fetchEditors() {
     }
 }
 
+
+
 export async function fetchLeaderboard() {
     const list = await fetchList();
+    const { PACK_DEFINITIONS } = await import('./packs.js');
 
-    const scoreMap = {};
+    if (!Array.isArray(list)) {
+        return [[], ['_list.json']];
+    }
+
+    const scoreMap = new Map();
     const errs = [];
-    list.forEach(([level, err], rank) => {
-        if (err) {
-            errs.push(err);
-            return;
+
+    function getUserKey(name) {
+        if (typeof name !== 'string' || !name.trim()) {
+            return null;
         }
 
-        // Verification
-        const verifier = Object.keys(scoreMap).find(
-            (u) => u.toLowerCase() === level.verifier.toLowerCase(),
-        ) || level.verifier;
-        scoreMap[verifier] ??= {
-            verified: [],
-            completed: [],
-            progressed: [],
-        };
-        const { verified } = scoreMap[verifier];
-        verified.push({
-            rank: rank + 1,
-            level: level.name,
-            score: score(rank + 1, 100, level.percentToQualify),
-            link: level.verification,
-        });
+        const trimmed = name.trim();
+        const normalized = trimmed.toLocaleLowerCase('en');
 
-        // Records
-        level.records.forEach((record) => {
-            const user = Object.keys(scoreMap).find(
-                (u) => u.toLowerCase() === record.user.toLowerCase(),
-            ) || record.user;
-            scoreMap[user] ??= {
+        for (const existing of scoreMap.keys()) {
+            if (existing.toLocaleLowerCase('en') === normalized) {
+                return existing;
+            }
+        }
+
+        return trimmed;
+    }
+
+    function ensurePlayer(name) {
+        const key = getUserKey(name);
+        if (!key) return null;
+
+        if (!scoreMap.has(key)) {
+            scoreMap.set(key, {
                 verified: [],
                 completed: [],
                 progressed: [],
-            };
-            const { completed, progressed } = scoreMap[user];
-            if (record.percent === 100) {
-                completed.push({
-                    rank: rank + 1,
-                    level: level.name,
-                    score: score(rank + 1, 100, level.percentToQualify),
-                    link: record.link,
-                });
-                return;
+                completedPaths: new Set(),
+            });
+        }
+
+        return scoreMap.get(key);
+    }
+
+    for (let index = 0; index < list.length; index++) {
+        const [level, error] = list[index];
+
+        if (error || !level) {
+            errs.push(error || `level-${index + 1}`);
+            continue;
+        }
+
+        const rank = index + 1;
+        const levelScore = percent =>
+            score(rank, percent, level.percentToQualify);
+
+        const verifier = ensurePlayer(level.verifier);
+
+        if (verifier) {
+            verifier.verified.push({
+                rank,
+                level: level.name,
+                path: level.path,
+                score: levelScore(100),
+                link: level.verification,
+            });
+
+            verifier.completedPaths.add(level.path);
+        }
+
+        if (!Array.isArray(level.records)) continue;
+
+        for (const record of level.records) {
+            if (
+                !record ||
+                typeof record.user !== 'string' ||
+                !Number.isFinite(Number(record.percent))
+            ) {
+                continue;
             }
 
-            progressed.push({
-                rank: rank + 1,
-                level: level.name,
-                percent: record.percent,
-                score: score(rank + 1, record.percent, level.percentToQualify),
-                link: record.link,
-            });
-        });
-    });
+            const player = ensurePlayer(record.user);
+            if (!player) continue;
 
-    // Wrap in extra Object containing the user and total score
-    const res = Object.entries(scoreMap).map(([user, scores]) => {
-        const { verified, completed, progressed } = scores;
-        const total = [verified, completed, progressed]
-            .flat()
-            .reduce((prev, cur) => prev + cur.score, 0);
+            const percent = Number(record.percent);
+
+            if (percent === 100) {
+                player.completed.push({
+                    rank,
+                    level: level.name,
+                    path: level.path,
+                    score: levelScore(100),
+                    link: record.link,
+                });
+
+                player.completedPaths.add(level.path);
+            } else {
+                player.progressed.push({
+                    rank,
+                    level: level.name,
+                    percent,
+                    score: levelScore(percent),
+                    link: record.link,
+                });
+            }
+        }
+    }
+
+    // Include linked accounts even when they have no level records.
+    try {
+        const response = await fetch('/api/leaderboard/identities', {
+            credentials: 'same-origin',
+            cache: 'no-store',
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (Array.isArray(data.identities)) {
+                for (const name of data.identities) {
+                    ensurePlayer(name);
+                }
+            }
+        } else {
+            console.warn(
+                'Could not load linked leaderboard identities:',
+                response.status,
+            );
+        }
+    } catch (error) {
+        console.warn('Could not load linked leaderboard identities.', error);
+    }
+
+    const leaderboard = [...scoreMap.entries()].map(([user, stats]) => {
+        const {
+            verified,
+            completed,
+            progressed,
+            completedPaths,
+        } = stats;
+
+        const packsBeaten = PACK_DEFINITIONS
+            .filter(pack =>
+                Array.isArray(pack.levelPaths) &&
+                pack.levelPaths.length > 0 &&
+                pack.levelPaths.every(path => completedPaths.has(path))
+            )
+            .map(pack => ({
+                id: pack.id,
+                name: pack.name,
+                category: pack.category,
+                bonus: pack.bonus,
+            }));
+
+        const levelTotal = [
+            ...verified,
+            ...completed,
+            ...progressed,
+        ].reduce((total, entry) => total + entry.score, 0);
+
+        const packBonus = packsBeaten.reduce(
+            (total, pack) => total + pack.bonus,
+            0,
+        );
 
         return {
             user,
-            total: round(total),
-            ...scores,
+            total: round(levelTotal + packBonus),
+            verified,
+            completed,
+            progressed,
+            packsBeaten,
+            packBonus: round(packBonus),
         };
     });
 
-    // Sort by total score
-    return [res.sort((a, b) => b.total - a.total), errs];
+    leaderboard.sort((a, b) =>
+        b.total - a.total ||
+        a.user.localeCompare(b.user, undefined, {
+            sensitivity: 'base',
+        })
+    );
+
+    return [leaderboard, errs];
 }
